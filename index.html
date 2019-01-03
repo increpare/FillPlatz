@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+
+	<style type="text/css">
+		table {
+    /*border: 1px solid green;*/
+    border-collapse: collapse;
+}
+body{
+	text-align: center;
+    background-color: lightblue;
+    margin: 0;
+    border: 0;
+    width:100%;
+    height:100%;
+    justify-content: center;
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	-moz-user-select: none; 
+	-webkit-user-select: none; 
+	-ms-user-select:none; 
+	user-select:none;
+	-o-user-select:none;
+}
+#Tabellehalter {
+    width:100%;
+    margin: 0px auto;
+    /*background-color: blue;*/
+}
+
+
+h1 {
+	display: inline;
+}
+table {
+    width:100%;
+    margin: 0px auto;
+    /*background-color: red;*/
+    /*margin: 5px;*/
+    /*padding: 10px;*/
+}
+td {
+    width:5%;
+    position:relative;
+    border: 2px solid black;
+}
+td:after{
+    content:'';
+    display:block;
+    margin-top:100%;
+    background-color: green;
+}
+
+.titelkiste {
+    width:5%;
+    position:relative;
+    background-color: yellow;
+}
+.titelkiste:after{
+    content:'';
+    display:block;
+    margin-top:0%;
+    background-color: green;
+}
+
+.scorebox {
+	font-size: 4vmin;
+    width:5%;
+    position:relative;
+    background-color: yellow;
+	vertical-align: bottom;
+}
+.scorebox:after{
+    content:'';
+    display:block;
+    margin-top:10%;
+    background-color: green;
+}
+
+td .content {
+	display: inline;
+	margin: 0;
+	padding: 0;
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+}
+
+.titeltexttd {
+	margin: 0;
+}
+
+.titeltext {
+	font-size:4vmin;
+	text-align: center;
+	vertical-align: bottom;
+}
+
+img {
+	width: 100%;
+	height: 100%;
+}
+
+.invtd{
+	background-color: #bac015;
+
+}
+
+.leertd{
+	border: 0;
+}
+
+.Spielplatz{
+	background-color: orange;
+}
+
+
+.being-dragged {
+/*    cursor: -webkit-grabbing;
+    cursor: grabbing;*/
+/*    background-color: white;
+*/}
+
+.draggable {
+    cursor: -webkit-grab;
+    cursor: grab;
+}
+
+</style>
+
+<script>
+
+var entität_namen = ["bat.svg","blowfish.svg","camel.svg","elephant.svg","fish.svg","fish2.svg","gorilla.svg","horse.svg","ladybug.svg","moth.svg","octopus.svg","penguin.svg","pig.svg","rabbit.svg","rhino.svg","rooster.svg","sheep.svg","spider.svg","squirrel.svg","turkey.svg"];
+
+ //end borrow
+
+function handleresize(){
+	//calc(min(1.6vw,2.4vh));
+	let vw=2.0;
+	let vh=2.75;
+	let ht = document.getElementById("Haupttabelle");
+	if (ht==null){
+		return;
+	}
+
+	var aspect = ht.clientWidth/ht.clientHeight;
+	var bodyaspect= window.innerWidth/window.innerHeight;
+	let halter = document.getElementById("Tabellehalter");
+
+	if (bodyaspect>aspect){
+		console.log("a");
+		var w = 90*aspect;
+		var h = 90;
+		halter.style.width=w+"vh";
+		halter.style.height=h+"vh";
+	} else {
+		console.log("b");
+		var w = 90;
+		var h = 90/aspect;
+		halter.style.width=w+"vw";
+		halter.style.height=h+"vw";
+	}
+}
+	
+	var sp_zeilen = 6;
+	var sp_spalten = 8;
+	var i_spalten=3;
+	var i_zeilen=3;
+
+
+	function bastelleTabelle(){
+		var behälter = document.getElementById("Tabellehalter");
+		var txt=`<TABLE id="Haupttabelle">
+    <colgroup>
+        <!-- <col> -->
+        <col span="${i_spalten}" class="Symbolleiste">
+        <col span="${sp_spalten}" class="Spielplatz">
+    </colgroup>
+	<tr>
+		<td class="scorebox" colspan="${i_spalten}">
+            <div class="content">Score 1000</div>
+        </td>
+		<td class="titelkiste titeltexttd" colspan="${sp_spalten}">
+      		<div class="content titeltexttd titeltext">TIERSPIEL ( <a href="credits.html">credits</a> )</div>      		
+        </td>
+		
+	</tr>`
+
+	txt+=`<tr>`
+
+	for (var j=0;j<sp_zeilen;j++){
+		txt+=`<tr>`
+
+		if (j<i_zeilen){
+			for (var i=0;i<i_spalten;i++){
+				var en =entität_namen[i+i_spalten*j];
+				txt+=`<td class="invtd">
+	            <div class="content">
+	            	<img class="draggable" src="clipart/zentriert/${en}" draggable="true">
+	            </div>
+	        </td>`
+			}
+		} else {
+			for (var i=0;i<i_spalten;i++){
+				var en =entität_namen[i+i_spalten*j];
+				txt+=`<td class="leertd">
+	            <div class="leer">
+	            </div>
+	        </td>`
+			}
+
+		}
+
+		for (var i=0;i<sp_spalten;i++){
+			txt+=`<td>
+            <div class="content dropzone"></div>
+        </td>`
+		}
+		txt+=`</tr>`
+	}
+
+
+
+
+		behälter.innerHTML = txt;
+
+	}
+
+
+
+	function globalSetup(){
+		bastelleTabelle();
+		handleresize();
+	}
+
+	window.onload =globalSetup;
+
+	window.onresize = handleresize;
+
+var dragged;
+
+  /* events fired on the draggable target */
+  document.addEventListener("drag", function( event ) {
+
+  }, false);
+
+  document.addEventListener("dragstart", function( event ) {
+      // store a ref. on the dragged elem
+      dragged = event.target;
+      // make it half transparent
+      event.target.style.opacity = .5;
+      event.dataTransfer.effectAllowed = "move";
+      event.target.classList.add("being-dragged");
+    	document.body.style.cursor="dragging";
+  }, false);
+
+  document.addEventListener("dragend", function( event ) {
+      // reset the transparency
+      event.target.style.opacity = "";
+    	event.target.classList.remove("being-dragged");
+    	document.body.style.cursor="";
+  }, false);
+
+  /* events fired on the drop targets */
+  document.addEventListener("dragover", function( event ) {
+      // prevent default to allow drop
+      event.preventDefault();
+  }, false);
+
+  document.addEventListener("dragenter", function( event ) {
+      // highlight potential drop target when the draggable element enters it
+      if ( event.target.classList.contains("dropzone") && event.target.innerHTML.trim()=="") {
+          event.target.style.background = "rgba(255,255,255,0.3)";
+      }
+
+  }, false);
+
+  document.addEventListener("dragleave", function( event ) {
+      // reset background of potential drop target when the draggable element leaves it
+      if ( event.target.classList.contains("dropzone")) {
+          event.target.style.background = "";
+      }
+
+  }, false);
+
+  document.addEventListener("drop", function( event ) {
+      // prevent default action (open as link for some elements)
+      event.preventDefault();
+      // move dragged elem to the selected drop target
+      if ( event.target.classList.contains("dropzone") && event.target.innerHTML.trim()=="") {
+          event.target.style.background = "";
+          dragged.parentNode.removeChild( dragged );
+          dragged.classList.remove("draggable")
+          dragged.draggable=false;
+          event.target.appendChild( dragged );
+      }
+    
+  }, false);
+	</script>
+</head>
+<body 
+unselectable="on">
+	<div id="Tabellehalter">
+
+</div>
+</body>
+</html>
